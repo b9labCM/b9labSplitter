@@ -30,10 +30,10 @@ Splitter.setProvider(web3.currentProvider);
 // Splitter
 const splitAmount = function() {
     // Html input vars
-    var receiver1 = $("#receiver1").val();
-    var receiver2 = $("#receiver2").val();
-    var etherValue = $("#split-ether").val();
-    var instance;
+    let receiver1 = $("#receiver1").val();
+    let receiver2 = $("#receiver2").val();
+    let etherValue = $("#split-ether").val();
+    let instance;
    $("#status").html("Split funds transaction in progress");
    $("#split-funds").attr("disabled",true);
    $("#withdraw-funds").attr("disabled",true);
@@ -54,7 +54,12 @@ const splitAmount = function() {
                 console.error("Wrong status");
                 console.error(receipt);
                 $("#status").html("There was an error in the tx execution, status not 1");
-            } else {
+            }else if (receipt.logs.length == 0) {
+                console.error("No logs");
+                console.error(receipt);
+                $("#status").html("There was an error in the tx execution, empty logs");
+            } 
+		 else {
                 // Format the event nicely.
                 $("#status").html("Transfer executed");
             }
@@ -65,7 +70,7 @@ const splitAmount = function() {
             $("#balance").html(balance.toString(10));
             $("#split-funds").attr("disabled",false);
             $("#withdraw-funds").attr("disabled",false);
-            return instance.getBalance(window.account); // this is the function defined in Splitter.sol
+           // return instance.getBalance(window.account); // this is the function defined in Splitter.sol
         }).catch(e => {
             $("#status").html(e.toString());
             console.error(e);
@@ -77,8 +82,8 @@ const splitAmount = function() {
 
 // withdraw
 const withdraw = function() {
-    var etherValue = $("#withdraw-ether").val();
-    var instance;
+    let etherValue = $("#withdraw-ether").val();
+    let instance;
     $("#split-funds").attr("disabled",true);
     $("#withdraw-funds").attr("disabled",true);
     $("#status").html("Withdraw funds transaction in progress");
@@ -97,7 +102,11 @@ const withdraw = function() {
                 console.error("Wrong status");
                 console.error(receipt);
                 $("#status").html("There was an error in the tx execution, status not 1");
-            } else {
+            } else if (receipt.logs.length == 0) {
+                console.error("No logs");
+                console.error(receipt);
+                $("#status").html("There was an error in the tx execution, empty logs");
+            }  else {
                 // Format the event nicely.
                 $("#status").html("Transfer executed");
             }
@@ -108,7 +117,7 @@ const withdraw = function() {
             $("#balance").html(balance.toString(10));
             $("#split-funds").attr("disabled",false);
             $("#withdraw-funds").attr("disabled",false);
-            return instance.getBalance(window.account);
+            //return instance.getBalance(window.account);
         }).catch(e => {
             $("#status").html(e.toString());
             console.error(e);
