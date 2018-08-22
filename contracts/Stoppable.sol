@@ -19,15 +19,17 @@ contract Stoppable is Owned {
     }
     
     function pauseContract() public onlyOwner onlyIfRunning returns(bool success) {
-        isRunning = false;
-        emit LogPausedContract(msg.sender);
+	emit LogPausedContract(msg.sender);        
+	isRunning = false;
+        
         return true;
     }
     
-    function resumeContract() public onlyOwner onlyIfRunning returns(bool success) {
+    function resumeContract() public onlyOwner returns(bool success) {
         require(!isRunning);
+	emit LogResumeContract(msg.sender);
         isRunning = true;
-        emit LogResumeContract(msg.sender);
+        
         return true;
     }
 }

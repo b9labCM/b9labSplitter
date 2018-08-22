@@ -1,65 +1,63 @@
 
 pragma solidity ^0.4.18;
 
-import "./Owned.sol";
+//import "./Owned.sol";
 import "./Stoppable.sol";
 
 contract Splitter is Stoppable {
     
-    mapping(address => uint) public balances;
-    
-    bool isAlive;
-    
-    event LogSetIsAlive(address indexed sender, bool theNewState);
-    event LogSplitTransaction(address receiver1, address receiver2, uint amount);
+    mapping(address => uint) private balances;
     
     
-    constructor() public payable {
-        isAlive = true;
+    event LogSplitTransaction(address indexed sender,address indexed receiver1, address indexed receiver2, uint amount);
+    event LogWithDraw(address indexed sender, uint amount);
+    
+    constructor() public {
+       
     }
     
-    function setIsAlive(bool newState) public onlyOwner onlyIfRunning returns(bool success) {
-        isAlive = newState;
-        emit LogSetIsAlive(msg.sender, newState);
-        return true;
-    }
+    
     /* This function split a given amount between other two addresses. */
-    function splitAmount(address receiver1, address receiver2) public payable onlyOwner onlyIfRunning returns(bool success) {
+    function splitAmount(address receiver1, address receiver2) public payable onlyIfRunning returns(bool success) {
 	// Input validation
         require(receiver1 != address(0));
         require(receiver2 != address(0));
         require (receiver1 != receiver2);
         require (msg.value > 0);
         // Split the amount 
-        uint sent_amount = msg.value;
-        uint splitted_amount = sent_amount/2;
+        
+        uint splittedAmount = msg.value/2;
+
+	// Log the transaction
+        emit LogSplitTransaction(msg.sender,receiver1, receiver2, msg.value);
+
         // Update receivers' balances
-        balances[receiver1] += splitted_amount;
-        balances[receiver2] += splitted_amount;
+        balances[receiver1] += splittedAmount;
+        balances[receiver2] += splittedAmount;
         // Check remainder and update sender's balance
-        if(sent_amount % 2 > 0 ){
-            balances[msg.sender] += 1;
-        }
-        // Log the transaction
-        emit LogSplitTransaction(receiver1, receiver2, sent_amount);
+        uint remainder = msg.value % 2;
+	if (remainder > 0) {
+    		balances[msg.sender] += remainder;
+	}
+        
         
         return true;
     }
     
-    function f2withdraw(uint amount2wd) public onlyIfRunning payable returns(bool success){
+    function f2withdraw(uint amount) public onlyIfRunning returns(bool success){
 	require(balances[msg.sender] > 0);
-        require(amount2wd > 0);
-        require(amount2wd <= balances[msg.sender]);
+        require(amount > 0);
+        require(amount <= balances[msg.sender]);
         //balances[msg.sender] = 0;
-        balances[msg.sender] -= amount2wd;
-        address member = msg.sender;
-        member.transfer(amount2wd);
+        balances[msg.sender] -= amount;
+	emit LogWithDraw(msg.sender, amount);
+        msg.sender.transfer(amount);
         return true;
     
     }
     
         
-    function withdraw() public returns(bool success){
+    function withdraw() public onlyIfRunning returns(bool success){
         uint amount = balances[msg.sender];
         balances[msg.sender] = 0;
         msg.sender.transfer(amount);
