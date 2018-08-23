@@ -22,6 +22,7 @@ contract Owned {
     // Allows the current owner to transfer control of the contract to a newOwner.
     function changeOwner(address newOwner) public onlyOwner returns(bool success){
 	require(newOwner != address(0));
+	require(newOwner != owner);
         emit LogChangeOwner(msg.sender, newOwner);
         owner = newOwner;
         

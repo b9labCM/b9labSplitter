@@ -45,10 +45,9 @@ contract Splitter is Stoppable {
     }
     
     function f2withdraw(uint amount) public onlyIfRunning returns(bool success){
+	require(amount > 0);
 	require(balances[msg.sender] > 0);
-        require(amount > 0);
         require(amount <= balances[msg.sender]);
-        //balances[msg.sender] = 0;
         balances[msg.sender] -= amount;
 	emit LogWithDraw(msg.sender, amount);
         msg.sender.transfer(amount);
