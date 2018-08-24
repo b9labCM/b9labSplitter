@@ -47,7 +47,8 @@ contract('Splitter', function(accounts) {
 			assert.equal(balance_D_before.toString(10), 0, " first account D before has not 0 balance");
 		    return inst.splitAmount(account_C,account_D,{ from: account_A, value: web3.toWei(0.4,"ether")})	
 		}).then( txObj => { 
-		    assert.equal(txObj.receipt.status,1, "split failed");
+            assert.equal(txObj.receipt.status,1, "split failed");
+            assert.equal(txObj.logs.length,1, "event has not been emitted");
 		    return inst.getBalance.call(account_C);
 		}).then( balance =>  {
 		    balance_C_after = new BigNumber (balance);
@@ -77,7 +78,8 @@ contract('Splitter', function(accounts) {
 			assert.equal(balance_D_before.toString(10), 0, " first account D before has not 0 balance");
 			return newInstance.splitAmount(account_C,account_D,{ from: account_A, value: web3.toWei(0.4,"ether")})	
 		}).then( txObj => { 
-			assert.equal(txObj.receipt.status,1, "split failed");
+            assert.equal(txObj.receipt.status,1, "split failed");
+            assert.equal(txObj.logs.length,1, "event has not been emitted");
 			return newInstance.getBalance.call(account_C);
 		}).then(balance =>  {
 			balance_C_after = new BigNumber (balance);
@@ -135,7 +137,9 @@ contract('Splitter', function(accounts) {
 		    return newInstance.f2withdraw(web3.toWei(0.01, "ether"),{from:account_C})
 		}).then ( _txObj => { 
 			txObj = _txObj;
-			assert.equal(txObj.receipt.status,1, "withdrawal failed");
+            assert.equal(txObj.receipt.status,1, "withdrawal failed");
+            assert.equal(txObj.logs.length,1, "event has not been emitted");
+            //in progress.....
 		})
 	}); 
 
